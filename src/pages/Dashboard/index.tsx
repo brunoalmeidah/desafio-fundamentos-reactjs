@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { parseISO, format } from 'date-fns';
 import income from '../../assets/income.svg';
 import outcome from '../../assets/outcome.svg';
 import total from '../../assets/total.svg';
@@ -30,7 +30,15 @@ interface Balance {
 }
 
 interface Response {
-  transactions: Transaction[];
+  transactions: {
+    id: string;
+    title: string;
+    value: number;
+    type: 'income' | 'outcome';
+    category: { title: string };
+    created_at: string;
+    category_id: string;
+  }[];
   balance: {
     income: number;
     outcome: number;
@@ -49,8 +57,24 @@ const Dashboard: React.FC = () => {
         transactions: transactionsResp,
         balance: balanceResp,
       } = response.data;
-      console.log(response.data);
-      setTransactions(transactionsResp);
+      // console.log(transactionsResp);
+      const transactionsFormatted = transactionsResp.map(item => {
+        return {
+          id: item.id,
+          title: item.title,
+          value: item.value,
+          formattedValue: formatValue(item.value),
+          formattedDate: format(parseISO(item.created_at), 'dd/MM/yyyy'),
+          type: item.type,
+          category: {
+            title: item.category.title,
+          },
+          created_at: parseISO(item.created_at),
+        };
+      });
+      console.log(transactionsFormatted);
+      setTransactions(transactionsFormatted);
+
       setBalance({
         income: formatValue(balanceResp.income),
         outcome: formatValue(balanceResp.outcome),
@@ -101,12 +125,18 @@ const Dashboard: React.FC = () => {
             </thead>
 
             <tbody>
-              <tr>
-                <td className="title">titulo</td>
-                <td className="income">R$ 1.000</td>
-                <td>Sell</td>
-                <td>20/04/2020</td>
-              </tr>
+              {transactions.map(item => (
+                <tr key={item.id}>
+                  <td className="title">{item.title}</td>
+                  <td className={item.type}>
+                    {`${item.type === 'outcome' ? '-' : ''}  ${
+                      item.formattedValue
+                    }`}
+                  </td>
+                  <td>{item.category.title}</td>
+                  <td>{item.formattedDate}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </TableContainer>

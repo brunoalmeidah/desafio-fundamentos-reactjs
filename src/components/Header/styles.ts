@@ -31,6 +31,17 @@ export const Container = styled.div<ContainerProps>`
           opacity: 0.6;
         }
       }
+
+      ul {
+        display: flex;
+        list-style: none;
+
+        li {
+          & + li {
+            margin-left: 20px;
+          }
+        }
+      }
     }
   }
 `;
