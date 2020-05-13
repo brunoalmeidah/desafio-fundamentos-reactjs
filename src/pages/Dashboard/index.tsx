@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
           created_at: parseISO(item.created_at),
         };
       });
-      console.log(transactionsFormatted);
+
       setTransactions(transactionsFormatted);
 
       setBalance({
